@@ -1,5 +1,5 @@
 import tensorflow as tf
-from keras import layers, models, metrics
+from tensorflow.keras import layers, models
 
 def simple_model(input_shape):
 
@@ -22,18 +22,40 @@ def conv2d_3x3(filters):
     )
     return conv
 
+def up_conv(image, filter1, filter2):
+    c = conv2d_3x3(filter1)(image)
+    c = conv2d_3x3(filter2)(c)
+    p = layers.UpSampling2D(
+        filter2, kernel_size=(2,2),padding='same'
+    )
+    return c, p
+
+
 def max_pool():
     return layers.MaxPooling2D((2, 2), strides=2, padding='same')
+
+def down_conv(image, filters):
+    c = conv2d_3x3(filters)(image)
+    c = conv2d_3x3(filters)(c)
+    p = max_pool()(c)
+
+    return c, p
 
 def unet(input_shape):
 
     image = layers.Input(shape=input_shape)
 
-    c1 = conv2d_3x3(8)(image)
-    c1 = conv2d_3x3(8)(c1)
-    p1 = max_pool()(c1)
+    #Down
+    c1, p1 = down_conv(image, 8)
+    c2, p2 = down_conv(p1, 16)
+    c3, p3 = down_conv(p2, 32)
+    c4, p4 = down_conv(p3, 64)
 
-    raise NotImplementedError("You have some work to do here!")
+
+    #Up
+    c5, p5 = up_conv(c4, p4, 128, 64)
+    
+
 
     # Fill the layers from 2 to 9.
     # .........................

@@ -173,6 +173,10 @@ def preds_evaluated(y_true, y_pred):
 
     return correct
 
+def get_precision(y_true, y_pred):
+
+    pass
+
 ##################  Optimizer with learning rate schedule ######################
 
 def get_optimizer():
@@ -205,6 +209,7 @@ def main(train_dir):
     train_loss = metrics.Mean()
     val_accuracy = metrics.Mean()
     val_loss = metrics.Mean()
+
 
     def train_step(image, y):
         """Updates model parameters, as well as `train_loss` and `train_accuracy`.
