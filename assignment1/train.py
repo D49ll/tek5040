@@ -177,7 +177,7 @@ def preds_evaluated(y_true, y_pred):
 
 def get_optimizer():
     # Just constant learning rate schedule
-    optimizer = optimizers.Adam(lr=1e-4)
+    optimizer = optimizers.Adam(learning_rate=1e-4)
     return optimizer
 
 def main(train_dir):
@@ -216,9 +216,27 @@ def main(train_dir):
         Returns:
             float tensor of shape [batch_size, height, width, 1] with probabilties
         """
+        #Find the predictions of the model for the batch of input images
+        with tf.GradientTape() as tape:
+            y_pred = model(image, training = True)
 
-        # TODO: Implement
-        y_pred = model(image) # TODO: Remove this line if you like
+            #Calculate the loss of the predictions with respect to the ground truth
+            loss = loss_fn(y,y_pred)
+
+        #Find the gradients
+        grads = tape.gradient(loss, model.trainable_variables)
+
+        #Update the model parameters using the optimizer
+        optimizer.apply_gradients(zip(grads, model.trainable_variables))
+
+        #Update train_loos variable with the loss
+        train_loss.update_state(loss)
+
+        #Evaluate the predictions against the ground thruth (labels) with the metric_fn
+        m = metric_fn(y, y_pred)
+
+        #Update train_accuracy
+        train_accuracy.update_state(m)
 
         return y_pred
 
@@ -233,8 +251,18 @@ def main(train_dir):
             float tensor of shape [batch_size, height, width, 1] with probabilties
         """
 
-        # TODO: Implement
-        y_pred = model(image) # TODO: Remove this line if you like
+        #Find the predictions of the model for the batch of input images
+        y_pred = model(image) #No need for GradientTape() cause we are not finding gradients
+
+        #Calculate the loss of the predictions with respect to the ground truth
+        loss = loss_fn(y, y_pred)
+
+        #Update val_loss variable with the calculated loss value
+        val_loss.update_state(loss)
+
+        #Evaluate the predictions against the ground truth with the metric_fn and update val_accuracy
+        m = metric_fn(y, y_pred)
+        val_accuracy.update_state(m)
 
         return y_pred
 

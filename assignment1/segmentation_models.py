@@ -1,7 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras import layers, models
-
-
+from keras import layers, models, metrics
 
 def simple_model(input_shape):
 
@@ -18,17 +16,14 @@ def simple_model(input_shape):
 
     return model
 
-
 def conv2d_3x3(filters):
     conv = layers.Conv2D(
         filters, kernel_size=(3, 3), activation='relu', padding='same'
     )
     return conv
 
-
 def max_pool():
     return layers.MaxPooling2D((2, 2), strides=2, padding='same')
-
 
 def unet(input_shape):
 
