@@ -59,9 +59,9 @@ def unet(input_shape):
     c8 = up_conv(tf.concat([c2, c7], 3), 8)
 
     #Output segment
-    probs = output_seg(tf.concat((c1,c8),3))
+    probs = output_seg(tf.concat([c1,c8],3))
 
     model = models.Model(inputs=image, outputs=probs)
-    model.summary()
+    print(model.summary())
 
     return model
